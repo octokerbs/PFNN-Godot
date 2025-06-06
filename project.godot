@@ -10,6 +10,11 @@ config_version=5
 
 [application]
 
-config/name="TP-redes_profundas"
-config/features=PackedStringArray("4.4", "Forward Plus")
+config/name="TP-DeepLearning"
+run/main_scene="uid://bfxg5hi2rw2ph"
+config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
+
+[dotnet]
+
+project/assembly_name="TP-DeepLearning"
