@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 
 namespace DeepLearning
 {
@@ -6,11 +6,11 @@ namespace DeepLearning
 	public partial class PFNN : NeuralNetwork
 	{
 
-		public int XDim = 0;
-		public int HDim = 0;
-		public int YDim = 0;
+		public int XDim = 468;
+		public int HDim = 512;
+		public int YDim = 376;
 
-		public int PhaseIndex = 0;
+		public int PhaseIndex = 375;
 
 		private Tensor Xmean, Xstd, Ymean, Ystd;
 		private Tensor[] W0, W1, W2, b0, b1, b2;
@@ -22,7 +22,24 @@ namespace DeepLearning
 
 		public PFNN()
 		{
+			
+		}
 
+		public override void _Ready()
+		{
+			StoreParameters();
+			LoadParametersDerived();
+			GD.Print("INPUT");
+			X.Print();
+			GD.Print(" ");
+			Predict();
+			GD.Print("OUTPUT");
+			Y.Print();
+		}
+
+		public override void _Process(double delta)
+		{
+			
 		}
 
 		protected override void StoreParametersDerived()
@@ -73,16 +90,13 @@ namespace DeepLearning
 		{
 			//Normalise Input
 			Normalise(X, Xmean, Xstd, Y);
-
 			//Process PFNN
 			int index = (int)((Phase / (2f * M_PI)) * 50f);
 			ELU(Layer(Y, W0[index], b0[index], Y));
 			ELU(Layer(Y, W1[index], b1[index], Y));
 			Layer(Y, W2[index], b2[index], Y);
-
 			//Renormalise Output
 			Renormalise(Y, Ymean, Ystd, Y);
-
 			//Update Phase
 			Phase = Repeat(Phase + (1f - Damping) * GetOutput(PhaseIndex) * 2f * Mathf.Pi, 2f * Mathf.Pi);
 		}
