@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://bfxg5hi2rw2ph"]
+[gd_scene load_steps=6 format=3 uid="uid://bfxg5hi2rw2ph"]
 
 [ext_resource type="Script" uid="uid://8vqmf48wv6fq" path="res://CharacterMover.cs" id="1_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://bafo880wvanvn" path="res://character.tscn" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://c46qs4wyj6min" path="res://Scripts/DeepLearning/Models/PFNN.cs" id="3_h2yge"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
 
@@ -28,3 +29,6 @@ shape = SubResource("CapsuleShape3D_lquwl")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 3, 3)
+
+[node name="NeuralNetworkTest" type="Node3D" parent="."]
+script = ExtResource("3_h2yge")

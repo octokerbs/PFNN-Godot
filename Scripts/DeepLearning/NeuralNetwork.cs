@@ -6,9 +6,9 @@ using Godot;
 namespace DeepLearning {
 	public abstract partial class NeuralNetwork : Node3D
 	{
-		[Export] public string Folder = "";
+		[Export] public string Folder = ".\\TensorFlow\\trained_Adam";
 		[Export] public string Destination = "";
-		[Export] public Parameters Parameters = null;
+		public Parameters Parameters = null;
 
 		public Tensor X, Y;
 		private int Pivot = -1;
@@ -21,21 +21,21 @@ namespace DeepLearning {
 
 
 		public void StoreParameters()
-        {
-            Parameters = new Parameters(); // Godot equivalent of ScriptableObject.CreateInstance
-            StoreParametersDerived();
-            if (!Parameters.Validate())
-            {
-                Parameters = null;
-            }
-            else
-            {
-                //TODO
-                // Saving parameters to file
-                // var savePath = $"res://{Destination}/Parameters.tres";
-                // ResourceSaver.Save(Parameters, savePath);
-            }
-        }
+		{
+			Parameters = new Parameters(); // Godot equivalent of ScriptableObject.CreateInstance
+			StoreParametersDerived();
+			if (!Parameters.Validate())
+			{
+				Parameters = null;
+			}
+			else
+			{
+				//TODO
+				// Saving parameters to file
+				// var savePath = $"res://{Destination}/Parameters.tres";
+				// ResourceSaver.Save(Parameters, savePath);
+			}
+		}
 
 		public void LoadParameters()
 		{
