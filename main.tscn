@@ -1,18 +1,30 @@
-[gd_scene load_steps=3 format=3 uid="uid://bfxg5hi2rw2ph"]
+[gd_scene load_steps=5 format=3 uid="uid://bfxg5hi2rw2ph"]
 
-[ext_resource type="Script" uid="uid://ljum31v2osp8" path="res://Cube.cs" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://8vqmf48wv6fq" path="res://CharacterMover.cs" id="1_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://bafo880wvanvn" path="res://character.tscn" id="2_0xm2m"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
 
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lquwl"]
+
 [node name="Main" type="Node3D"]
 
-[node name="Cube" type="MeshInstance3D" parent="."]
-transform = Transform3D(127.467, 0, 0, 0, 1, 0, 0, 0, 126.271, 0, 0, 0)
+[node name="Terrain" type="MeshInstance3D" parent="."]
+transform = Transform3D(131.232, 0, 0, 0, 1.03, 0, 0, 0, 130, 0, 0, 0)
 mesh = SubResource("BoxMesh_0xm2m")
-script = ExtResource("1_ig7tw")
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.984217, 0.176965, 0, -0.176965, 0.984217, 0, 2.7135, 5.32172)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.834684, 0.550728, 0, -0.550728, 0.834684, -2.31622, 1.8017, 6.36052)
+transform = Transform3D(-0.69065, 0.122795, -0.712688, -0.12941, 0.948588, 0.288849, 0.711516, 0.291722, -0.639252, 0, 0, 0)
+
+[node name="CharacterRoot" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("1_0xm2m")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_lquwl")
+
+[node name="Character" parent="CharacterRoot" instance=ExtResource("2_0xm2m")]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 3, 3)
