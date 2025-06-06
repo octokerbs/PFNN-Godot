@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b7dwdtl7ysd4g"
-path.s3tc="res://.godot/imported/Character_9.png-eb2cd59dd39b20ec3db2b9223a5a7ce1.s3tc.ctex"
+uid="uid://dyry7jwcbb5ai"
+path.s3tc="res://.godot/imported/Character_1.png-3dbd37aff509956bc69573a37ff319cb.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "e8c5463b5f550163456b4cc30ebdf7dc"
+"md5": "43cf727c7d0e604c6b1365da5832120c"
 }
 
 [deps]
 
-source_file="res://Assets/Character_9.png"
-dest_files=["res://.godot/imported/Character_9.png-eb2cd59dd39b20ec3db2b9223a5a7ce1.s3tc.ctex"]
+source_file="res://assets/character/model/Character_1.png"
+dest_files=["res://.godot/imported/Character_1.png-3dbd37aff509956bc69573a37ff319cb.s3tc.ctex"]
 
 [params]
 
@@ -23,12 +23,12 @@ compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=1
-roughness/src_normal="res://assets/Character_9.png"
+roughness/mode=0
+roughness/src_normal=""
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/normal_map_invert_y=false

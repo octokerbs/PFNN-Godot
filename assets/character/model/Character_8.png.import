@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://85pv7s58tt8"
-path="res://.godot/imported/Character_6.png-e7229b688e490d08902405d3d0209e8f.ctex"
+uid="uid://f5bt7dpxip7j"
+path="res://.godot/imported/Character_8.png-332e36c597ff38b2f05ca6e9643b5344.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "27d48b8d541ad7856b05d5d94f777851"
+"md5": "2d587278a85fad80781d506cd65941b6"
 }
 
 [deps]
 
-source_file="res://Assets/Character_6.png"
-dest_files=["res://.godot/imported/Character_6.png-e7229b688e490d08902405d3d0209e8f.ctex"]
+source_file="res://assets/character/model/Character_8.png"
+dest_files=["res://.godot/imported/Character_8.png-332e36c597ff38b2f05ca6e9643b5344.ctex"]
 
 [params]
 

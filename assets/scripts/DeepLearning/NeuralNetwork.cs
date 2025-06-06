@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using Godot;
 
 
-namespace DeepLearning {
+namespace DeepLearning
+{
 	public abstract partial class NeuralNetwork : Node3D
 	{
-		[Export] public string Folder = ".\\TensorFlow\\trained_Adam";
+		[Export] public string Folder = ".\\assets\\scripts\\DeepLearning\\tensorFlow\\trained_Adam";
 		[Export] public string Destination = "";
 		public Parameters Parameters = null;
 
