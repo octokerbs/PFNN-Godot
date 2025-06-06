@@ -7,6 +7,7 @@
 [node name="Main" type="Node3D"]
 
 [node name="Cube" type="MeshInstance3D" parent="."]
+transform = Transform3D(127.467, 0, 0, 0, 1, 0, 0, 0, 126.271, 0, 0, 0)
 mesh = SubResource("BoxMesh_0xm2m")
 script = ExtResource("1_ig7tw")
 
