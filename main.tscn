@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bfxg5hi2rw2ph"]
 
 [ext_resource type="Script" uid="uid://8vqmf48wv6fq" path="res://CharacterMover.cs" id="1_0xm2m"]
-[ext_resource type="PackedScene" uid="uid://cn7gb3j7yp58y" path="res://assets/Character.fbx" id="3_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://bafo880wvanvn" path="res://character.tscn" id="2_0xm2m"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
 
@@ -16,15 +16,15 @@ mesh = SubResource("BoxMesh_0xm2m")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.69065, 0.122795, -0.712688, -0.12941, 0.948588, 0.288849, 0.711516, 0.291722, -0.639252, 0, 0, 0)
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
+[node name="CharacterRoot" type="CharacterBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_0xm2m")
 
-[node name="Character" parent="CharacterBody3D" instance=ExtResource("3_1bvp3")]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_lquwl")
+
+[node name="Character" parent="CharacterRoot" instance=ExtResource("2_0xm2m")]
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 3, 3)
