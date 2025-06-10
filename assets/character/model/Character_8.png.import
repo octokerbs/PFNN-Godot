@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://f5bt7dpxip7j"
-path="res://.godot/imported/Character_8.png-332e36c597ff38b2f05ca6e9643b5344.ctex"
+path="res://.godot/imported/Character_8.png-85fb67cb2c2551bdfe378fa8012f404d.ctex"
 metadata={
 "vram_texture": false
 }
@@ -13,8 +13,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/character/model/Character_8.png"
-dest_files=["res://.godot/imported/Character_8.png-332e36c597ff38b2f05ca6e9643b5344.ctex"]
+source_file="res://Assets/character/model/Character_8.png"
+dest_files=["res://.godot/imported/Character_8.png-85fb67cb2c2551bdfe378fa8012f404d.ctex"]
 
 [params]
 

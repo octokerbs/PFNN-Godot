@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://bfxg5hi2rw2ph"]
 
-[ext_resource type="Script" uid="uid://8vqmf48wv6fq" path="res://assets/scripts/Character/CharacterMover.cs" id="1_h2yge"]
-[ext_resource type="PackedScene" uid="uid://bafo880wvanvn" path="res://assets/character/character.tscn" id="2_1bvp3"]
-[ext_resource type="Script" uid="uid://c46qs4wyj6min" path="res://assets/scripts/DeepLearning/Models/PFNN.cs" id="3_lquwl"]
+[ext_resource type="Script" uid="uid://o682o73psv20" path="res://assets/scripts/Character/CharacterMover.cs" id="1_h2yge"]
+[ext_resource type="PackedScene" uid="uid://bafo880wvanvn" path="res://Assets/character/character.tscn" id="2_1bvp3"]
+[ext_resource type="Script" uid="uid://cl1rpeqqghgxv" path="res://assets/scripts/DeepLearning/Models/PFNN.cs" id="3_lquwl"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
 
