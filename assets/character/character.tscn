@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://bafo880wvanvn"]
+[gd_scene load_steps=3 format=3 uid="uid://bafo880wvanvn"]
 
 [ext_resource type="PackedScene" uid="uid://cn7gb3j7yp58y" path="res://assets/character/model/Character.fbx" id="1_glpr6"]
+[ext_resource type="Script" uid="uid://cnsr37t6n4252" path="res://assets/scripts/Character/BioAnimation.cs" id="2_dbrvq"]
 
 [node name="Character" instance=ExtResource("1_glpr6")]
 
@@ -47,3 +48,4 @@ bones/55/rotation = Quaternion(-0.000522738, -0.016105, 0.999344, -0.0324368)
 bones/56/rotation = Quaternion(-0.0296365, 2.38372e-05, -0.000803968, 0.99956)
 bones/57/rotation = Quaternion(0.461439, -0.0247855, 0.0128979, 0.886732)
 bones/60/rotation = Quaternion(0.000690123, -0.0212702, 0.999248, 0.0324212)
+script = ExtResource("2_dbrvq")

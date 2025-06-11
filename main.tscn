@@ -35,7 +35,7 @@ transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 
 script = ExtResource("3_lquwl")
 
 [node name="CharacterRoot" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.569322, 0)
 script = ExtResource("1_h2yge")
 
 [node name="Character" parent="CharacterRoot" instance=ExtResource("2_1bvp3")]
