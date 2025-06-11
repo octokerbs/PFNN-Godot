@@ -1,6 +1,4 @@
 using Godot;
-using System;
-using System.Collections.Generic;
 using DeepLearning;
 
 namespace SIGGRAPH_2018
@@ -47,11 +45,6 @@ namespace SIGGRAPH_2018
         #region Core Components
         /// <summary>Handles user input and style blending</summary>
         public Controller Controller;
-
-        /// <summary>Character rig with bone hierarchy</summary>
-        private Actor Actor;    // Hay que cambiarlo por skeleton
-
-        private Skeleton3D Skeleton;
 
         /// <summary>Phase-Functioned Neural Network for motion prediction</summary>
         private PFNN NN;
@@ -116,19 +109,17 @@ namespace SIGGRAPH_2018
                 Controller = new Controller();
 
             // Get required components - try as child nodes first, then as attached components
-            // Actor = GetNode<Actor>("Actor");
-            Skeleton = GetNode<Skeleton3D>("Character/Skeleton3D");
-            NN = GetNode<PFNN>("PFNN");
+            NN = GetNode<PFNN>("../../../PFNN");
 
             // Initialize target direction based on current transform (flattened to ground plane)
             TargetDirection = new Vector3(GlobalTransform.Basis.Z.X, 0f, GlobalTransform.Basis.Z.Z);
             TargetVelocity = Vector3.Zero;
 
             // Allocate arrays for bone state tracking
-            Positions = new Vector3[Actor.Bones.Length];
-            Forwards = new Vector3[Actor.Bones.Length];
-            Ups = new Vector3[Actor.Bones.Length];
-            Velocities = new Vector3[Actor.Bones.Length];
+            Positions = new Vector3[GetBoneCount()];
+            Forwards = new Vector3[GetBoneCount()];
+            Ups = new Vector3[GetBoneCount()];
+            Velocities = new Vector3[GetBoneCount()];
 
             // Create trajectory predictor with initial position and direction
             Trajectory = new Trajectory(Points, Controller.GetNames(), GlobalPosition, TargetDirection);
@@ -144,14 +135,14 @@ namespace SIGGRAPH_2018
 
             // Initialize bone state arrays with current bone transforms
             GD.Print("Initializing bone states...");
-            for (int i = 0; i < Actor.Bones.Length; i++)
+            for (int i = 0; i < GetBoneCount(); i++)
             {
-                Positions[i] = Actor.Bones[i].Transform.Position;
-                GD.Print($"Bone: {Actor.Bones[i].GetName()} | Index: {i}");
+                Positions[i] = GetBoneGlobalPose(i).Origin;
+                GD.Print($"Bone: {GetBoneName(i)} | Index: {i}");
 
                 // Note: Godot uses -Z as forward direction, Y as up
-                Forwards[i] = -Actor.Bones[i].Transform.Basis.Z;
-                Ups[i] = Actor.Bones[i].Transform.Basis.Y;
+                Forwards[i] = -GetBoneGlobalPose(i).Basis.Z; // -Actor.Bones[i].Transform.Basis.Z;
+                Ups[i] = GetBoneGlobalPose(i).Basis.Y; //Actor.Bones[i].Transform.Basis.Y;
                 Velocities[i] = Vector3.Zero; // Start with no velocity
             }
             GD.Print("Bone initialization complete.");
@@ -164,32 +155,6 @@ namespace SIGGRAPH_2018
             }
             NN.LoadParameters();
         }
-
-        /// <summary>
-        /// Main animation loop - called every frame.
-        /// Handles trajectory prediction and neural network-based animation generation.
-        /// </summary>
-        /// <param name="delta">Time elapsed since last frame</param>
-        // public override void _Process(double delta)
-        // {
-        //     // Ensure consistent 60 FPS for stable neural network predictions
-        //     Engine.MaxFps = 60;
-
-        //     // Exit early if neural network isn't ready
-        //     if (NN.Parameters == null)  // Se inicializa en null => No podemos pedir los parameters de null
-        //         return;
-
-        //     // Update trajectory prediction based on user input
-        //     if (TrajectoryControl)
-        //         PredictTrajectory();
-
-        //     // Generate new animation pose using neural network
-        //     if (NN.Parameters != null)
-        //         Animate();
-
-        //     // Update character's root position to match trajectory
-        //     GlobalPosition = Trajectory.Points[RootPointIndex].GetPosition();
-        // }
 
         public override void _Process(double delta)
         {
@@ -359,7 +324,7 @@ namespace SIGGRAPH_2018
             previousRoot.Origin = new Vector3(previousRoot.Origin.X, 0f, previousRoot.Origin.Z); // For flat terrain
 
             // Input Previous Bone Positions / Velocities
-            for (int i = 0; i < Actor.Bones.Length; i++)
+            for (int i = 0; i < GetBoneCount(); i++)
             {
                 Vector3 pos = Positions[i].GetRelativePositionTo(previousRoot);
                 Vector3 forward = Forwards[i].GetRelativeDirectionTo(previousRoot);
@@ -379,7 +344,7 @@ namespace SIGGRAPH_2018
                 NN.SetInput(start + i * JointDimIn + 10, vel.Y);
                 NN.SetInput(start + i * JointDimIn + 11, vel.Z);
             }
-            start += JointDimIn * Actor.Bones.Length;
+            start += JointDimIn * GetBoneCount();
 
             // Predict
             float rest = Mathf.Pow(1.0f - Trajectory.Points[RootPointIndex].Styles[0], 0.25f);
@@ -403,9 +368,9 @@ namespace SIGGRAPH_2018
             Vector3 translationalOffset = Vector3.Zero;
             float rotationalOffset = 0f;
             Vector3 rootMotion = new Vector3(
-                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * Actor.Bones.Length + 0),
-                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * Actor.Bones.Length + 1),
-                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * Actor.Bones.Length + 2)
+                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * GetBoneCount() + 0),
+                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * GetBoneCount() + 1),
+                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * GetBoneCount() + 2)
             );
             rootMotion /= Framerate;
             translationalOffset = rest * new Vector3(rootMotion.X, 0f, rootMotion.Z);
@@ -509,7 +474,7 @@ namespace SIGGRAPH_2018
             start += TrajectoryDimOut * 6;
 
             // Compute Posture
-            for (int i = 0; i < Actor.Bones.Length; i++)
+            for (int i = 0; i < GetBoneCount(); i++)
             {
                 Vector3 position = new Vector3(
                     NN.GetOutput(start + i * JointDimOut + 0),
@@ -540,16 +505,19 @@ namespace SIGGRAPH_2018
                 Ups[i] = up;
                 Velocities[i] = velocity;
             }
-            start += JointDimOut * Actor.Bones.Length;
+            start += JointDimOut * GetBoneCount();
 
             // Assign Posture
             GlobalPosition = nextRoot.Origin;
             GlobalTransform = new Transform3D(nextRoot.Basis, nextRoot.Origin);
 
-            for (int i = 0; i < Actor.Bones.Length; i++)
+            for (int i = 0; i < GetBoneCount(); i++)
             {
-                Actor.Bones[i].Transform.Position = Positions[i];
-                Actor.Bones[i].Transform.Basis = Basis.LookingAt(-Forwards[i], Ups[i]); // Godot uses -Z as forward
+                Transform3D pose = GetBonePose(i);
+                pose.Origin = Positions[i];
+                pose.Basis = Basis.LookingAt(-Forwards[i], Ups[i]);
+
+                SetBonePose(i, pose);
             }
         }
 
