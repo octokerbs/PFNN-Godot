@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cg58ihiht03lr"
-path.s3tc="res://.godot/imported/Character_0.png-8b3a15c65e68c9b7c052a8318e93bfae.s3tc.ctex"
+uid="uid://cp5y7m6oo6n7a"
+path.s3tc="res://.godot/imported/Sky_Day_BlueSky_Equirect.png-efe497ff61fb167d4b0fc2fbc1c3d904.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "ce77a62169aea0837f50d1f63172e01d"
-}
 
 [deps]
 
-source_file="res://assets/character/model/Character_0.png"
-dest_files=["res://.godot/imported/Character_0.png-8b3a15c65e68c9b7c052a8318e93bfae.s3tc.ctex"]
+source_file="res://assets/Sky_Day_BlueSky_Equirect.png"
+dest_files=["res://.godot/imported/Sky_Day_BlueSky_Equirect.png-efe497ff61fb167d4b0fc2fbc1c3d904.s3tc.ctex"]
 
 [params]
 

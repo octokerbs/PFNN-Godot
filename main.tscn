@@ -1,12 +1,23 @@
-[gd_scene load_steps=6 format=3 uid="uid://bfxg5hi2rw2ph"]
+[gd_scene load_steps=10 format=3 uid="uid://bfxg5hi2rw2ph"]
 
-[ext_resource type="Script" uid="uid://o682o73psv20" path="res://assets/scripts/Character/CharacterMover.cs" id="1_h2yge"]
-[ext_resource type="PackedScene" uid="uid://bafo880wvanvn" path="res://Assets/character/character.tscn" id="2_1bvp3"]
-[ext_resource type="Script" uid="uid://cl1rpeqqghgxv" path="res://assets/scripts/DeepLearning/Models/PFNN.cs" id="3_lquwl"]
+[ext_resource type="Script" uid="uid://8vqmf48wv6fq" path="res://assets/scripts/Character/CharacterMover.cs" id="1_h2yge"]
+[ext_resource type="PackedScene" uid="uid://bafo880wvanvn" path="res://assets/character/character.tscn" id="2_1bvp3"]
+[ext_resource type="Script" uid="uid://c46qs4wyj6min" path="res://assets/scripts/DeepLearning/Models/PFNN.cs" id="3_lquwl"]
+[ext_resource type="Texture2D" uid="uid://cp5y7m6oo6n7a" path="res://assets/Sky_Day_BlueSky_Equirect.png" id="4_1bvp3"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lquwl"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_lquwl"]
+panorama = ExtResource("4_1bvp3")
+
+[sub_resource type="Sky" id="Sky_7mycd"]
+sky_material = SubResource("PanoramaSkyMaterial_lquwl")
+
+[sub_resource type="Environment" id="Environment_272bh"]
+background_mode = 2
+sky = SubResource("Sky_7mycd")
 
 [node name="Main" type="Node3D"]
 
@@ -17,18 +28,21 @@ mesh = SubResource("BoxMesh_0xm2m")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.69065, 0.122795, -0.712688, -0.12941, 0.948588, 0.288849, 0.711516, 0.291722, -0.639252, 0, 0, 0)
 
-[node name="CharacterRoot" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-script = ExtResource("1_h2yge")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterRoot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-shape = SubResource("CapsuleShape3D_lquwl")
-
-[node name="Character" parent="CharacterRoot" instance=ExtResource("2_1bvp3")]
-
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 3, 3)
 
 [node name="NeuralNetworkTest" type="Node3D" parent="."]
 script = ExtResource("3_lquwl")
+
+[node name="CharacterRoot" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("1_h2yge")
+
+[node name="Character" parent="CharacterRoot" instance=ExtResource("2_1bvp3")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_lquwl")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_272bh")

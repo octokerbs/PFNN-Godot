@@ -1,29 +1,25 @@
 using Godot;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 
-#if TOOLS
-using Godot;
-#endif
+
 
 /// <summary>
 /// Actor class for managing skeletal hierarchies in Godot.
 /// Provides functionality for skeleton extraction, bone management, and posture tracking.
 /// </summary>
 [GlobalClass]
-public partial class Actor : Node3D {
+public partial class Actor : Node3D
+{
 
 	#region Inspector Properties
 	/// <summary>Inspector flag for skeleton visualization (legacy - kept for compatibility)</summary>
 	[Export] public bool InspectSkeleton = false;
-	
+
 	/// <summary>Drawing flags (legacy - kept for compatibility)</summary>
 	[Export] public bool DrawRoot = false;
 	[Export] public bool DrawSkeleton = true;
 	[Export] public bool DrawVelocities = false;
 	[Export] public bool DrawTransforms = false;
-	
+
 	/// <summary>Visual properties (legacy - kept for compatibility)</summary>
 	[Export] public float BoneSize = 0.025f;
 	[Export] public Color BoneColor = Colors.Black;
@@ -39,8 +35,10 @@ public partial class Actor : Node3D {
 	/// <summary>
 	/// Called when the node is ready. Automatically extracts skeleton in editor mode.
 	/// </summary>
-	public override void _Ready() {
-		if (Engine.IsEditorHint()) {
+	public override void _Ready()
+	{
+		if (Engine.IsEditorHint())
+		{
 			ExtractSkeleton();
 		}
 	}
@@ -51,7 +49,8 @@ public partial class Actor : Node3D {
 	/// Gets the root node of this actor (itself).
 	/// </summary>
 	/// <returns>The root Node3D</returns>
-	public Node3D GetRoot() {
+	public Node3D GetRoot()
+	{
 		return this;
 	}
 
@@ -60,17 +59,22 @@ public partial class Actor : Node3D {
 	/// </summary>
 	/// <param name="name">Name of the node to find</param>
 	/// <returns>The found Node3D or null if not found</returns>
-	public Node3D FindTransform(string name) {
+	public Node3D FindTransform(string name)
+	{
 		Node3D element = null;
 		System.Action<Node3D> recursion = null;
-		recursion = new System.Action<Node3D>((node) => {
-			if(node.Name == name) {
+		recursion = new System.Action<Node3D>((node) =>
+		{
+			if (node.Name == name)
+			{
 				element = node;
 				return;
 			}
 			// Iterate through all children, filtering for Node3D types
-			foreach(Node child in node.GetChildren()) {
-				if(child is Node3D node3D) {
+			foreach (Node child in node.GetChildren())
+			{
+				if (child is Node3D node3D)
+				{
 					recursion(node3D);
 				}
 			}
@@ -86,7 +90,8 @@ public partial class Actor : Node3D {
 	/// </summary>
 	/// <param name="transform">The Node3D transform to search for</param>
 	/// <returns>The corresponding bone or null if not found</returns>
-	public Bone FindBone(Node3D transform) {
+	public Bone FindBone(Node3D transform)
+	{
 		return System.Array.Find(Bones, x => x.Transform == transform);
 	}
 
@@ -95,7 +100,8 @@ public partial class Actor : Node3D {
 	/// </summary>
 	/// <param name="name">Exact name of the bone to find</param>
 	/// <returns>The bone with matching name or null if not found</returns>
-	public Bone FindBone(string name) {
+	public Bone FindBone(string name)
+	{
 		return System.Array.Find(Bones, x => x.GetName() == name);
 	}
 
@@ -104,7 +110,8 @@ public partial class Actor : Node3D {
 	/// </summary>
 	/// <param name="name">Partial name to search for</param>
 	/// <returns>The first bone containing the name or null if not found</returns>
-	public Bone FindBoneContains(string name) {
+	public Bone FindBoneContains(string name)
+	{
 		return System.Array.Find(Bones, x => x.GetName().Contains(name));
 	}
 	#endregion
@@ -114,24 +121,29 @@ public partial class Actor : Node3D {
 	/// Extracts the complete skeleton hierarchy starting from the root node.
 	/// Recursively processes all Node3D children to build the bone structure.
 	/// </summary>
-	public void ExtractSkeleton() {
+	public void ExtractSkeleton()
+	{
 		ArrayExtensions.Clear(ref Bones);
 		System.Action<Node3D, Bone> recursion = null;
-		recursion = new System.Action<Node3D, Bone>((node, parent) => {
+		recursion = new System.Action<Node3D, Bone>((node, parent) =>
+		{
 			// Create a new bone for this node
 			Bone bone = new Bone(this, node, Bones.Length);
 			ArrayExtensions.Add(ref Bones, bone);
-			
+
 			// Establish parent-child relationships
-			if(parent != null) {
+			if (parent != null)
+			{
 				bone.Parent = parent.Index;
 				ArrayExtensions.Add(ref parent.Childs, bone.Index);
 			}
 			parent = bone;
-			
+
 			// Recursively process all Node3D children
-			foreach(Node child in node.GetChildren()) {
-				if(child is Node3D node3D) {
+			foreach (Node child in node.GetChildren())
+			{
+				if (child is Node3D node3D)
+				{
 					recursion(node3D, parent);
 				}
 			}
@@ -144,26 +156,32 @@ public partial class Actor : Node3D {
 	/// Only processes nodes that are included in the provided array.
 	/// </summary>
 	/// <param name="bones">Array of Node3D transforms to include in the skeleton</param>
-	public void ExtractSkeleton(Node3D[] bones) {
+	public void ExtractSkeleton(Node3D[] bones)
+	{
 		ArrayExtensions.Clear(ref Bones);
 		System.Action<Node3D, Bone> recursion = null;
-		recursion = new System.Action<Node3D, Bone>((node, parent) => {
+		recursion = new System.Action<Node3D, Bone>((node, parent) =>
+		{
 			// Only process nodes that are in the specified bones array
-			if(System.Array.Find(bones, x => x == node) != null) {
+			if (System.Array.Find(bones, x => x == node) != null)
+			{
 				Bone bone = new Bone(this, node, Bones.Length);
 				ArrayExtensions.Add(ref Bones, bone);
-				
+
 				// Establish parent-child relationships
-				if(parent != null) {
+				if (parent != null)
+				{
 					bone.Parent = parent.Index;
 					ArrayExtensions.Add(ref parent.Childs, bone.Index);
 				}
 				parent = bone;
 			}
-			
+
 			// Continue recursion through all children
-			foreach(Node child in node.GetChildren()) {
-				if(child is Node3D node3D) {
+			foreach (Node child in node.GetChildren())
+			{
+				if (child is Node3D node3D)
+				{
 					recursion(node3D, parent);
 				}
 			}
@@ -178,9 +196,11 @@ public partial class Actor : Node3D {
 	/// Useful for animation systems and pose analysis.
 	/// </summary>
 	/// <returns>Array of Transform3D representing each bone's world transform</returns>
-	public Transform3D[] GetPosture() {
+	public Transform3D[] GetPosture()
+	{
 		Transform3D[] posture = new Transform3D[Bones.Length];
-		for(int i=0; i<posture.Length; i++) {
+		for (int i = 0; i < posture.Length; i++)
+		{
 			posture[i] = Bones[i].Transform.GlobalTransform;
 		}
 		return posture;
@@ -191,9 +211,11 @@ public partial class Actor : Node3D {
 	/// Used for motion analysis and animation blending.
 	/// </summary>
 	/// <returns>Array of Vector3 representing each bone's velocity</returns>
-	public Vector3[] GetVelocities() {
+	public Vector3[] GetVelocities()
+	{
 		Vector3[] velocities = new Vector3[Bones.Length];
-		for(int i=0; i<velocities.Length; i++) {
+		for (int i = 0; i < velocities.Length; i++)
+		{
 			velocities[i] = Bones[i].Velocity;
 		}
 		return velocities;
@@ -205,7 +227,8 @@ public partial class Actor : Node3D {
 	/// Called every frame. Currently unused but kept for potential future debug functionality.
 	/// </summary>
 	/// <param name="delta">Time since last frame</param>
-	public override void _Process(double delta) {
+	public override void _Process(double delta)
+	{
 		// Drawing functionality removed - no debug rendering needed
 	}
 	#endregion
@@ -216,23 +239,24 @@ public partial class Actor : Node3D {
 	/// Contains transform reference, velocity data, and hierarchical relationships.
 	/// </summary>
 	[System.Serializable]
-	public class Bone {
+	public class Bone
+	{
 		#region Properties
 		/// <summary>Reference to the parent Actor</summary>
 		public Actor Actor;
-		
+
 		/// <summary>The Node3D transform this bone represents</summary>
 		public Node3D Transform;
-		
+
 		/// <summary>Current velocity of this bone</summary>
 		public Vector3 Velocity;
-		
+
 		/// <summary>Index of this bone in the Actor's Bones array</summary>
 		public int Index;
-		
+
 		/// <summary>Index of the parent bone (-1 if root)</summary>
 		public int Parent;
-		
+
 		/// <summary>Array of child bone indices</summary>
 		public int[] Childs;
 		#endregion
@@ -244,7 +268,8 @@ public partial class Actor : Node3D {
 		/// <param name="actor">Reference to the parent Actor</param>
 		/// <param name="transform">The Node3D this bone represents</param>
 		/// <param name="index">Index in the bone array</param>
-		public Bone(Actor actor, Node3D transform, int index) {
+		public Bone(Actor actor, Node3D transform, int index)
+		{
 			Actor = actor;
 			Transform = transform;
 			Velocity = Vector3.Zero;
@@ -259,7 +284,8 @@ public partial class Actor : Node3D {
 		/// Gets the name of this bone (from its Node3D).
 		/// </summary>
 		/// <returns>The bone's name</returns>
-		public string GetName() {
+		public string GetName()
+		{
 			return Transform.Name;
 		}
 
@@ -267,7 +293,8 @@ public partial class Actor : Node3D {
 		/// Gets the parent bone of this bone.
 		/// </summary>
 		/// <returns>Parent bone or null if this is the root</returns>
-		public Bone GetParent() {
+		public Bone GetParent()
+		{
 			return Parent == -1 ? null : Actor.Bones[Parent];
 		}
 
@@ -276,7 +303,8 @@ public partial class Actor : Node3D {
 		/// </summary>
 		/// <param name="index">Index of the child to retrieve</param>
 		/// <returns>Child bone or null if index is out of range</returns>
-		public Bone GetChild(int index) {
+		public Bone GetChild(int index)
+		{
 			return index >= Childs.Length ? null : Actor.Bones[Childs[index]];
 		}
 
@@ -285,10 +313,14 @@ public partial class Actor : Node3D {
 		/// Returns 0 for root bones.
 		/// </summary>
 		/// <returns>Distance to parent bone</returns>
-		public float GetLength() {
-			if(GetParent() == null) {
+		public float GetLength()
+		{
+			if (GetParent() == null)
+			{
 				return 0f;
-			} else {
+			}
+			else
+			{
 				return GetParent().Transform.GlobalPosition.DistanceTo(Transform.GlobalPosition);
 			}
 		}
@@ -297,11 +329,11 @@ public partial class Actor : Node3D {
 	#endregion
 
 	#region Editor Support (Legacy)
-	#if TOOLS
+#if TOOLS
 	// Note: Godot's editor plugins work differently than Unity's custom editors
 	// You'll need to create a separate EditorPlugin for the inspector functionality
 	// This is just a placeholder structure showing how the data would be organized
-	
+
 	/*
 	[Tool]
 	public partial class ActorEditorPlugin : EditorPlugin {
@@ -309,6 +341,6 @@ public partial class Actor : Node3D {
 		// Godot uses a different system for custom inspectors
 	}
 	*/
-	#endif
+#endif
 	#endregion
 }
