@@ -4,7 +4,6 @@ using Godot;
 [System.Serializable]
 public partial class Controller : Resource
 {
-
 	[Export] public bool Inspect = false;
 
 	[Export] public Key Forward = Key.W;
@@ -14,7 +13,7 @@ public partial class Controller : Resource
 	[Export] public Key TurnLeft = Key.Q;
 	[Export] public Key TurnRight = Key.E;
 
-	[Export] public Style[] Styles = new Style[0];
+	[Export] public Style[] Styles = { new Style(), new Style(), new Style() };
 
 	public float[] GetStyle()
 	{
@@ -74,6 +73,7 @@ public partial class Controller : Resource
 
 	public void SetStyleCount(int count)
 	{
+		GD.Print("Set style count called with number: ", count);
 		count = Mathf.Max(count, 0);
 		if (Styles.Length != count)
 		{
@@ -127,7 +127,7 @@ public partial class Controller : Resource
 	[System.Serializable]
 	public partial class Style : Resource
 	{
-		[Export] public string Name;
+		[Export] public string Name = "Wilkinson";
 		[Export] public float Bias = 1f;
 		[Export] public float Transition = 0.1f;
 		public Key[] Keys = new Key[0];
