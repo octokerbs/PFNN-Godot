@@ -1,5 +1,6 @@
 using Godot;
 using DeepLearning;
+using System.ComponentModel;
 
 namespace SIGGRAPH_2018
 {
@@ -168,13 +169,13 @@ namespace SIGGRAPH_2018
 			// Update trajectory prediction based on user input
 			if (TrajectoryControl)
 				PredictTrajectory();
-			Trajectory.Draw(4);
+			Trajectory.Draw(1);
 
 			// Generate new animation pose using neural network
-			Animate();
+			//Animate();
 
 			// Update character's root position to match trajectory
-			GlobalPosition = Trajectory.Points[RootPointIndex].GetPosition();
+			//GlobalPosition = Trajectory.Points[RootPointIndex].GetPosition();
 		}
 
 		/// <summary>
@@ -191,20 +192,30 @@ namespace SIGGRAPH_2018
 			float turn = Controller.QueryTurn();
 			Vector3 move = Controller.QueryMove();
 
-			GD.Print("turn: " + turn);
-			GD.Print("move: " + move);
+			GetParent<Node3D>().GlobalPosition += move;
 
 			bool control = turn != 0f || move != Vector3.Zero; // Is user actively controlling?
 
 			// Smooth transition of target direction and velocity
 			// Use different rates for active control vs. natural decay
-			TargetDirection = TargetDirection.Lerp(
-				new Basis(Vector3.Up, Mathf.DegToRad(turn * 60f)) * Trajectory.Points[RootPointIndex].GetDirection(),
-				control ? TargetGain : TargetDecay
-			);
+			DebugDraw3D.DrawArrow(GlobalPosition, GlobalPosition + TargetDirection * 1.5f, Colors.Black, 0.05f);
+			TargetDirection = updateTargetDirection(turn, control);
+			DebugDraw3D.DrawArrow(GlobalPosition, GlobalPosition + TargetDirection * 1.5f, Colors.Brown, 0.05f);
+
 
 			// Convert target direction to world space movement
+			GD.Print(Mathf.Atan2(TargetDirection.X, TargetDirection.Z));
 			Vector3 lookDirection = new Basis(Vector3.Up, Mathf.Atan2(TargetDirection.X, TargetDirection.Z)) * move;
+			//Vector3 lookDirection = new Basis(Vector3.Up, Mathf.Atan2(TargetDirection.X, TargetDirection.Z)) * move;
+			Vector3 lookDirectionDebug = -lookDirection;
+			DebugDraw3D.DrawArrow(GlobalPosition, GlobalPosition + lookDirectionDebug * 1.5f, Colors.Blue, 0.05f);
+
+			GD.Print("Global Position: " + GlobalPosition);
+			GD.Print("move: " + move);
+			GD.Print("Flecha: " + GlobalPosition + " | " + (lookDirection));
+
+
+
 			TargetVelocity = TargetVelocity.Lerp(
 				bias * lookDirection.Normalized(),
 				control ? TargetGain : TargetDecay
@@ -256,43 +267,53 @@ namespace SIGGRAPH_2018
 			// Apply blended positions to trajectory
 			for (int i = RootPointIndex + 1; i < Trajectory.Points.Length; i++)
 			{
-				Trajectory.Points[i].SetPosition(trajectory_positions_blend[i]);
+				Trajectory.Points[i].SetPosition(trajectory_positions_blend[i] + Position);
 			}
+
+			//Trajectory.Postprocess();
 
 			// === STYLE BLENDING ===
-			// Update animation style based on movement speed and user input
-			float[] style = Controller.GetStyle();
+			// // Update animation style based on movement speed and user input
+			// float[] style = Controller.GetStyle();
 
-			// Auto-adjust walk/run style based on velocity when not jumping
-			if (style[2] == 0f) // If not jumping
-			{
-				style[1] = Mathf.Max(style[1],
-					Mathf.Clamp(Trajectory.Points[RootPointIndex].GetVelocity().Length(), 0f, 1f));
-			}
+			// // Auto-adjust walk/run style based on velocity when not jumping
+			// if (style[2] == 0f) // If not jumping
+			// {
+			// 	style[1] = Mathf.Max(style[1],
+			// 		Mathf.Clamp(Trajectory.Points[RootPointIndex].GetVelocity().Length(), 0f, 1f));
+			// }
 
-			// Propagate style changes through future trajectory points
-			for (int i = RootPointIndex; i < Trajectory.Points.Length; i++)
-			{
-				float weight = (float)(i - RootPointIndex) / (float)FuturePoints;
-				for (int j = 0; j < Trajectory.Points[i].Styles.Length; j++)
-				{
-					Trajectory.Points[i].Styles[j] = Utility.Interpolate(
-						Trajectory.Points[i].Styles[j],
-						style[j],
-						Utility.Normalise(weight, 0f, 1f, Controller.Styles[j].Transition, 1f)
-					);
-				}
-				Utility.Normalise(ref Trajectory.Points[i].Styles); // Keep styles normalized
+			// // Propagate style changes through future trajectory points
+			// for (int i = RootPointIndex; i < Trajectory.Points.Length; i++)
+			// {
+			// 	float weight = (float)(i - RootPointIndex) / (float)FuturePoints;
+			// 	for (int j = 0; j < Trajectory.Points[i].Styles.Length; j++)
+			// 	{
+			// 		Trajectory.Points[i].Styles[j] = Utility.Interpolate(
+			// 			Trajectory.Points[i].Styles[j],
+			// 			style[j],
+			// 			Utility.Normalise(weight, 0f, 1f, Controller.Styles[j].Transition, 1f)
+			// 		);
+			// 	}
+			// 	Utility.Normalise(ref Trajectory.Points[i].Styles); // Keep styles normalized
 
-				// Update movement speed
-				Trajectory.Points[i].SetSpeed(
-					Utility.Interpolate(
-						Trajectory.Points[i].GetSpeed(),
-						TargetVelocity.Length(),
+			// 	// Update movement speed
+			// 	Trajectory.Points[i].SetSpeed(
+			// 		Utility.Interpolate(
+			// 			Trajectory.Points[i].GetSpeed(),
+			// 			TargetVelocity.Length(),
+			// 			control ? TargetGain : TargetDecay
+			// 		)
+			// 	);
+			// }
+		}
+
+		private Vector3 updateTargetDirection(float turn, bool control)
+		{
+			return TargetDirection.Lerp(
+						new Basis(Vector3.Up, Mathf.DegToRad(turn * 60f)) * Trajectory.Points[RootPointIndex].GetDirection(),
 						control ? TargetGain : TargetDecay
-					)
-				);
-			}
+					);
 		}
 
 		private void Animate()

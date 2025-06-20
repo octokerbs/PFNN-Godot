@@ -40,11 +40,11 @@ public partial class Controller : Resource
 		Vector3 move = Vector3.Zero;
 		if (Input.IsKeyPressed(Forward))
 		{
-			move.Z += 1f;
+			move.Z -= 1f;
 		}
 		if (Input.IsKeyPressed(Back))
 		{
-			move.Z -= 1f;
+			move.Z += 1f;
 		}
 		if (Input.IsKeyPressed(Left))
 		{

@@ -15,7 +15,7 @@ public partial class CharacterMover : CharacterBody3D
 			velocity.Y = 0;
 
 
-		Vector2 input = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+		Vector2 input = Input.GetVector("ui_left", "ui_right", "ui_down", "ui_up");
 		Vector3 direction = new Vector3(input.X, 0, input.Y);
 
 		if (direction != Vector3.Zero)
