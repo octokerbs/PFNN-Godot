@@ -282,7 +282,7 @@ public static class Utility
 
     public static float GetHeight(Vector3 origin, uint mask)
     {
-        return 10000;
+        return 0;
     }
 
     public static float GetSlope(Vector3 origin, uint mask)
