@@ -28,13 +28,13 @@ namespace DeepLearning
 		public override void _Ready()
 		{
 			StoreParameters();
-			LoadParametersDerived();
-			GD.Print("INPUT");
-			X.Print();
-			GD.Print(" ");
-			Predict();
-			GD.Print("OUTPUT");
-			Y.Print();
+			// LoadParametersDerived();
+			// GD.Print("INPUT");
+			// X.Print();
+			// GD.Print(" ");
+			// Predict();
+			// GD.Print("OUTPUT");
+			// Y.Print();
 		}
 
 		public override void _Process(double delta)

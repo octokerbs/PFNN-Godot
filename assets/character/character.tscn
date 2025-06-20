@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bafo880wvanvn"]
 
 [ext_resource type="PackedScene" uid="uid://cn7gb3j7yp58y" path="res://assets/character/model/Character.fbx" id="1_glpr6"]
-[ext_resource type="Script" uid="uid://cnsr37t6n4252" path="res://assets/scripts/Character/BioAnimation.cs" id="2_dbrvq"]
+[ext_resource type="Script" uid="uid://bnc1xfns4u1cq" path="res://assets/scripts/Character/BioAnimation.cs" id="2_dbrvq"]
 
 [node name="Character" instance=ExtResource("1_glpr6")]
 

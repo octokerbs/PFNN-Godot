@@ -1,8 +1,8 @@
 [gd_scene load_steps=11 format=3 uid="uid://bfxg5hi2rw2ph"]
 
-[ext_resource type="Script" uid="uid://8vqmf48wv6fq" path="res://assets/scripts/Character/CharacterMover.cs" id="1_h2yge"]
+[ext_resource type="Script" uid="uid://o682o73psv20" path="res://assets/scripts/Character/CharacterMover.cs" id="1_h2yge"]
 [ext_resource type="PackedScene" uid="uid://bafo880wvanvn" path="res://assets/character/character.tscn" id="2_1bvp3"]
-[ext_resource type="Script" uid="uid://c46qs4wyj6min" path="res://assets/scripts/DeepLearning/Models/PFNN.cs" id="3_lquwl"]
+[ext_resource type="Script" uid="uid://cl1rpeqqghgxv" path="res://assets/scripts/DeepLearning/Models/PFNN.cs" id="3_lquwl"]
 [ext_resource type="Texture2D" uid="uid://cp5y7m6oo6n7a" path="res://assets/Sky_Day_BlueSky_Equirect.png" id="4_1bvp3"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_lquwl"]
