@@ -1,5 +1,6 @@
 using Godot;
 using DeepLearning;
+using System;
 
 namespace SIGGRAPH_2018
 {
@@ -98,6 +99,39 @@ namespace SIGGRAPH_2018
         private const int PointDensity = 10;
         #endregion
 
+        private const int UnityBonesCount = 28;
+
+        private int[] unityToGodotMapping = {
+            0,  // HIPS
+            1,    // CHEST
+            2,    // CHEST2
+            -1,    // No existe en godot, lo ignoramos
+            3,    // CHEST4
+            4,    // NECK
+            5,    // HEAD
+            6,    // HEADSITE
+            31,    // RIGHTCOLLAR
+            32,    // RIGHTSHOULDER
+            33,    // RIGHTELBOW
+            34,    // RIGHTWRIST
+            -1, // RIGHTWRISTSITE No existe en godot, lo ignoramos
+            7,    // LEFTCOLLAR
+            8,    // LEFTSHOULDER
+            9,    // LEFTELBOW
+            10,    // LEFTWRIST
+            -1, // LEFTWRISTSITE No existe en godot, lo ignoramos
+            60,    // RIGHTHIP
+            61,    // RIGHTKNEE
+            62,    // RIGHTANKLE
+            63,    // RIGHTTOE
+            64,    // RIGHTTOESITE
+            55,    // LEFTHIP
+            56,    // LEFTKNEE
+            57,    // LEFTANKLE
+            58,    // LEFTTOE
+            59,    // LEFTTOESITE
+        };
+
         /// <summary>
         /// Initialize the animation system components and character state.
         /// Called when the node enters the scene tree.
@@ -116,10 +150,10 @@ namespace SIGGRAPH_2018
             TargetVelocity = Vector3.Zero;
 
             // Allocate arrays for bone state tracking
-            Positions = new Vector3[GetBoneCount()];
-            Forwards = new Vector3[GetBoneCount()];
-            Ups = new Vector3[GetBoneCount()];
-            Velocities = new Vector3[GetBoneCount()];
+            Positions = new Vector3[UnityBonesCount];
+            Forwards = new Vector3[UnityBonesCount];
+            Ups = new Vector3[UnityBonesCount];
+            Velocities = new Vector3[UnityBonesCount];
 
             // Create trajectory predictor with initial position and direction
             Trajectory = new Trajectory(Points, Controller.GetNames(), GlobalPosition, TargetDirection);
@@ -134,26 +168,43 @@ namespace SIGGRAPH_2018
             }
 
             // Initialize bone state arrays with current bone transforms
-            GD.Print("Initializing bone states...");
-            for (int i = 0; i < GetBoneCount(); i++)
+            for (int i = 0; i < UnityBonesCount; i++)
             {
                 Positions[i] = GetBoneGlobalPose(i).Origin;
-                GD.Print($"Bone: {GetBoneName(i)} | Index: {i}");
-
-                // Note: Godot uses -Z as forward direction, Y as up
-                Forwards[i] = -GetBoneGlobalPose(i).Basis.Z; // -Actor.Bones[i].Transform.Basis.Z;
+                Forwards[i] = GetBoneGlobalPose(i).Basis.Z; // -Actor.Bones[i].Transform.Basis.Z;
                 Ups[i] = GetBoneGlobalPose(i).Basis.Y; //Actor.Bones[i].Transform.Basis.Y;
                 Velocities[i] = Vector3.Zero; // Start with no velocity
             }
-            GD.Print("Bone initialization complete.");
 
-            // Load neural network parameters
-            if (NN.Parameters == null)
+            // Vector3[] LastPositions = new Vector3[UnityBonesCount];
+            // Array.Copy(Positions, LastPositions, UnityBonesCount);
+
+            // Animate();
+
+            // for (int i = 0; i < UnityBonesCount; i++)
+            // {
+            //     GD.Print($"Bone: {GetBoneName(i)} \nPrevious Position: {LastPositions[i]} \nNew Position: {Positions[i]} \n");
+            // }
+
+            //
+            // Codigo de Unity como referencia
+            //
+            //Assign Posture
+            // transform.position = nextRoot.GetPosition();
+            // transform.rotation = nextRoot.GetRotation();
+            // for (int i = 0; i < Actor.Bones.Length; i++)
+            // {
+            //     Actor.Bones[i].Transform.position = Positions[i];
+            //     Actor.Bones[i].Transform.rotation = Quaternion.LookRotation(Forwards[i], Ups[i]);
+            // }
+
+            for (int i = 0; i < UnityBonesCount; i++)
             {
-                GD.PrintErr("No neural network parameters found! Animation will not work.");
-                return;
+                Transform3D pose = GetBonePose(unityToGodotMapping[i]);
+                pose.Origin = Positions[i];
+                pose.Basis = Basis.LookingAt(-Forwards[i], Ups[i]);
+                SetBonePose(unityToGodotMapping[i], pose);  // No deberia modificarse nada, aun asi se rompe todo el esqueleto
             }
-            NN.LoadParameters();
         }
 
         public override void _Process(double delta)
@@ -170,10 +221,10 @@ namespace SIGGRAPH_2018
                 PredictTrajectory();
 
             // Generate new animation pose using neural network
-            Animate();
+            //Animate();
 
             // Update character's root position to match trajectory
-            GlobalPosition = Trajectory.Points[RootPointIndex].GetPosition();
+            // GlobalPosition = Trajectory.Points[RootPointIndex].GetPosition();
         }
 
         /// <summary>
@@ -199,7 +250,7 @@ namespace SIGGRAPH_2018
             );
 
             // Convert target direction to world space movement
-            Vector3 lookDirection = new Basis(Vector3.Up, Mathf.Atan2(TargetDirection.X, TargetDirection.Z)) * move;
+            Vector3 lookDirection = new Basis(Vector3.Up, Mathf.Atan2(TargetDirection.X, -TargetDirection.Z)) * move;
             TargetVelocity = TargetVelocity.Lerp(
                 bias * lookDirection.Normalized(),
                 control ? TargetGain : TargetDecay
@@ -294,7 +345,7 @@ namespace SIGGRAPH_2018
         {
             // Calculate Root
             Transform3D currentRoot = Trajectory.Points[RootPointIndex].GetTransformation();
-            currentRoot.Origin = new Vector3(currentRoot.Origin.X, 0f, currentRoot.Origin.Z); // For flat terrain
+            currentRoot.Origin = new Vector3(currentRoot.Origin.X, 0f, -currentRoot.Origin.Z); // For flat terrain
 
             int start = 0;
             // Input Trajectory Positions / Directions / Velocities / Styles
@@ -306,11 +357,11 @@ namespace SIGGRAPH_2018
                 float speed = GetSample(i).GetSpeed();
 
                 NN.SetInput(start + i * TrajectoryDimIn + 0, pos.X);
-                NN.SetInput(start + i * TrajectoryDimIn + 1, pos.Z);
+                NN.SetInput(start + i * TrajectoryDimIn + 1, -pos.Z);
                 NN.SetInput(start + i * TrajectoryDimIn + 2, dir.X);
-                NN.SetInput(start + i * TrajectoryDimIn + 3, dir.Z);
+                NN.SetInput(start + i * TrajectoryDimIn + 3, -dir.Z);
                 NN.SetInput(start + i * TrajectoryDimIn + 4, vel.X);
-                NN.SetInput(start + i * TrajectoryDimIn + 5, vel.Z);
+                NN.SetInput(start + i * TrajectoryDimIn + 5, -vel.Z);
                 NN.SetInput(start + i * TrajectoryDimIn + 6, speed);
 
                 for (int j = 0; j < Controller.Styles.Length; j++)
@@ -321,10 +372,10 @@ namespace SIGGRAPH_2018
             start += TrajectoryDimIn * PointSamples;
 
             Transform3D previousRoot = Trajectory.Points[RootPointIndex - 1].GetTransformation();
-            previousRoot.Origin = new Vector3(previousRoot.Origin.X, 0f, previousRoot.Origin.Z); // For flat terrain
+            previousRoot.Origin = new Vector3(previousRoot.Origin.X, 0f, -previousRoot.Origin.Z); // For flat terrain
 
             // Input Previous Bone Positions / Velocities
-            for (int i = 0; i < GetBoneCount(); i++)
+            for (int i = 0; i < UnityBonesCount; i++)
             {
                 Vector3 pos = Positions[i].GetRelativePositionTo(previousRoot);
                 Vector3 forward = Forwards[i].GetRelativeDirectionTo(previousRoot);
@@ -333,18 +384,18 @@ namespace SIGGRAPH_2018
 
                 NN.SetInput(start + i * JointDimIn + 0, pos.X);
                 NN.SetInput(start + i * JointDimIn + 1, pos.Y);
-                NN.SetInput(start + i * JointDimIn + 2, pos.Z);
+                NN.SetInput(start + i * JointDimIn + 2, -pos.Z);
                 NN.SetInput(start + i * JointDimIn + 3, forward.X);
                 NN.SetInput(start + i * JointDimIn + 4, forward.Y);
-                NN.SetInput(start + i * JointDimIn + 5, forward.Z);
+                NN.SetInput(start + i * JointDimIn + 5, -forward.Z);
                 NN.SetInput(start + i * JointDimIn + 6, up.X);
                 NN.SetInput(start + i * JointDimIn + 7, up.Y);
-                NN.SetInput(start + i * JointDimIn + 8, up.Z);
+                NN.SetInput(start + i * JointDimIn + 8, -up.Z);
                 NN.SetInput(start + i * JointDimIn + 9, vel.X);
                 NN.SetInput(start + i * JointDimIn + 10, vel.Y);
-                NN.SetInput(start + i * JointDimIn + 11, vel.Z);
+                NN.SetInput(start + i * JointDimIn + 11, -vel.Z);
             }
-            start += JointDimIn * GetBoneCount();
+            start += JointDimIn * UnityBonesCount;
 
             // Predict
             float rest = Mathf.Pow(1.0f - Trajectory.Points[RootPointIndex].Styles[0], 0.25f);
@@ -368,12 +419,12 @@ namespace SIGGRAPH_2018
             Vector3 translationalOffset = Vector3.Zero;
             float rotationalOffset = 0f;
             Vector3 rootMotion = new Vector3(
-                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * GetBoneCount() + 0),
-                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * GetBoneCount() + 1),
-                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * GetBoneCount() + 2)
+                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * UnityBonesCount + 0),
+                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * UnityBonesCount + 1),
+                NN.GetOutput(TrajectoryDimOut * 6 + JointDimOut * UnityBonesCount + 2)
             );
             rootMotion /= Framerate;
-            translationalOffset = rest * new Vector3(rootMotion.X, 0f, rootMotion.Z);
+            translationalOffset = rest * new Vector3(rootMotion.X, 0f, -rootMotion.Z);
             rotationalOffset = rest * rootMotion.Y;
 
             Trajectory.Points[RootPointIndex].SetPosition(translationalOffset.GetRelativePositionFrom(currentRoot));
@@ -474,7 +525,7 @@ namespace SIGGRAPH_2018
             start += TrajectoryDimOut * 6;
 
             // Compute Posture
-            for (int i = 0; i < GetBoneCount(); i++)
+            for (int i = 0; i < UnityBonesCount; i++)
             {
                 Vector3 position = new Vector3(
                     NN.GetOutput(start + i * JointDimOut + 0),
@@ -505,19 +556,21 @@ namespace SIGGRAPH_2018
                 Ups[i] = up;
                 Velocities[i] = velocity;
             }
-            start += JointDimOut * GetBoneCount();
+            start += JointDimOut * UnityBonesCount;
 
             // Assign Posture
             GlobalPosition = nextRoot.Origin;
             GlobalTransform = new Transform3D(nextRoot.Basis, nextRoot.Origin);
 
-            for (int i = 0; i < GetBoneCount(); i++)
+            for (int i = 0; i < UnityBonesCount; i++)
             {
-                Transform3D pose = GetBonePose(i);
-                pose.Origin = Positions[i];
-                pose.Basis = Basis.LookingAt(-Forwards[i], Ups[i]);
-
-                SetBonePose(i, pose);
+                if (unityToGodotMapping[i] > 0)
+                {
+                    Transform3D pose = GetBonePose(unityToGodotMapping[i]);
+                    pose.Origin = Positions[i];
+                    pose.Basis = Basis.LookingAt(-Forwards[i], Ups[i]);
+                    SetBonePose(unityToGodotMapping[i], pose);
+                }
             }
         }
 
