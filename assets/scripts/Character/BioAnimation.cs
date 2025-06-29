@@ -170,11 +170,17 @@ namespace SIGGRAPH_2018
             // Initialize bone state arrays with current bone transforms
             for (int i = 0; i < UnityBonesCount; i++)
             {
-                Positions[i] = GetBoneGlobalPose(i).Origin;
-                Forwards[i] = GetBoneGlobalPose(i).Basis.Z; // -Actor.Bones[i].Transform.Basis.Z;
-                Ups[i] = GetBoneGlobalPose(i).Basis.Y; //Actor.Bones[i].Transform.Basis.Y;
-                Velocities[i] = Vector3.Zero; // Start with no velocity
+                if (unityToGodotMapping[i] >= 0)
+                {
+                    int godotBoneIndex = unityToGodotMapping[i];
+                    
+                    Positions[i] = GetBoneGlobalPose(godotBoneIndex).Origin;
+                    Forwards[i] = GetBoneGlobalPose(godotBoneIndex).Basis.Z;
+                    Ups[i] = GetBoneGlobalPose(godotBoneIndex).Basis.Y;
+                    Velocities[i] = Vector3.Zero;
+                }
             }
+
 
             // Vector3[] LastPositions = new Vector3[UnityBonesCount];
             // Array.Copy(Positions, LastPositions, UnityBonesCount);
@@ -202,7 +208,7 @@ namespace SIGGRAPH_2018
             {
                 Transform3D pose = GetBonePose(unityToGodotMapping[i]);
                 pose.Origin = Positions[i];
-                pose.Basis = Basis.LookingAt(-Forwards[i], Ups[i]);
+                pose.Basis = Basis.LookingAt(Forwards[i], Ups[i]);
                 SetBonePose(unityToGodotMapping[i], pose);  // No deberia modificarse nada, aun asi se rompe todo el esqueleto
             }
         }
